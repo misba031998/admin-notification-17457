@@ -1,0 +1,16 @@
+{
+  "name": "nodeadminapi",
+  "version": "1.0.0",
+  "description": "misba create this",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "googleapis": "^149.0.0"
+  }
+}
