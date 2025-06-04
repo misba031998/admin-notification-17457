@@ -133,6 +133,74 @@ app.post('/send-multiple-messages', async (req, res) => {
   res.json({ results });
 });
 
+// ✅ POST /send-multiple-messages-val
+app.post('/send-multiple-messages-val', async (req, res) => {
+  const { tokens, title, body, image, link } = req.body;
+
+  if (!Array.isArray(tokens) || !title || !body) {
+    return res.status(400).json({ error: "'tokens' must be an array and title/body are required" });
+  }
+
+  const accessToken = await getAccessToken();
+  if (!accessToken) return res.status(500).json({ error: 'Failed to get access token' });
+
+  // Replace placeholders #var, #var1, #var2
+  const replaceVars = (template, vars = []) => {
+    if (!Array.isArray(vars)) vars = [];
+    return template
+      .replace(/#var2/g, vars[2] ?? '#var2')
+      .replace(/#var1/g, vars[1] ?? '#var1')
+      .replace(/#var/g, vars[0] ?? '#var');
+  };
+
+  const results = [];
+
+  for (const item of tokens) {
+    const { token, vars = [] } = item;
+
+    const personalizedTitle = replaceVars(title, vars);
+    const personalizedBody = replaceVars(body, vars);
+
+    const payload = {
+      message: {
+        token,
+        notification: {
+          title: personalizedTitle,
+          body: personalizedBody,
+          ...(image ? { image } : {})
+        },
+        webpush: {
+          fcm_options: { ...(link ? { link } : {}) }
+        }
+      }
+    };
+
+    try {
+      const response = await axios.post(
+        `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      results.push({ token, httpCode: response.status, response: response.data });
+    } catch (err) {
+      results.push({
+        token,
+        httpCode: err.response?.status || 500,
+        response: err.response?.data || 'Failed to send',
+      });
+    }
+  }
+
+  res.json({ results });
+});
+
+
 // Start the server
 app.listen(port, () => {
   console.log(`✅ Server is running at http://localhost:${port}`);
