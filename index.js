@@ -120,7 +120,13 @@ app.post('/send-multiple-messages', async (req, res) => {
         }
       );
 
-      results.push({ token, httpCode: response.status, response: response.data });
+      results.push({
+        token,
+        httpCode: response.status,
+        response: response.data,
+        title: personalizedTitle,
+        message: personalizedBody
+      });
     } catch (err) {
       results.push({
         token,
@@ -187,7 +193,13 @@ app.post('/send-multiple-messages-val', async (req, res) => {
         }
       );
 
-      results.push({ token, httpCode: response.status, response: response.data });
+      results.push({
+        token,
+        httpCode: response.status,
+        response: response.data,
+        title: personalizedTitle,
+        message: personalizedBody
+      });
     } catch (err) {
       results.push({
         token,
