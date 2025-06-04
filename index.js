@@ -2,6 +2,7 @@ const express = require('express');
 const { google } = require('googleapis');
 const dotenv = require('dotenv');
 const axios = require('axios');
+const cors = require('cors');
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'OPTIONS'],
   credentials: true
 }));
+app.options('*', cors());
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
