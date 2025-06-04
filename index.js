@@ -6,6 +6,11 @@ const axios = require('axios');
 dotenv.config();
 
 const app = express();
+app.use(cors({
+  origin: 'http://webinfotechedu.com', // 🔒 allow only your frontend domain
+  methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: true
+}));
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
