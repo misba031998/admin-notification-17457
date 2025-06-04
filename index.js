@@ -7,12 +7,18 @@ const cors = require('cors');
 dotenv.config();
 
 const app = express();
-app.use(cors({
-  origin: 'http://webinfotechedu.com', // 🔒 allow only your frontend domain
+// ✅ CORS middleware
+const corsOptions = {
+  origin: 'http://webinfotechedu.com',
   methods: ['GET', 'POST', 'OPTIONS'],
-  credentials: true
-}));
-app.options('*', cors());
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+// ✅ Explicitly handle OPTIONS preflight before other routes
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
