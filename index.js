@@ -7,7 +7,7 @@ const cors = require('cors');
 dotenv.config();
 
 const app = express();
-// ✅ CORS middleware
+
 const corsOptions = {
   origin: 'http://webinfotechedu.com',
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -16,9 +16,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-// ✅ Explicitly handle OPTIONS preflight before other routes
-app.options('*', cors(corsOptions));
+// app.options('*', cors(corsOptions)); // Handle CORS preflight
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
@@ -69,9 +67,9 @@ app.post('/send-single-message', async (req, res) => {
   const payload = {
     message: {
       token,
-      notification: { title, body, image: image || undefined },
+      notification: { title, body, ...(image ? { image } : {}) },
       webpush: {
-        fcm_options: { link: link || undefined }
+        fcm_options: { ...(link ? { link } : {}) }
       }
     }
   };
@@ -114,9 +112,9 @@ app.post('/send-multiple-messages', async (req, res) => {
     const payload = {
       message: {
         token,
-        notification: { title, body, image: image || undefined },
+        notification: { title, body, ...(image ? { image } : {}) },
         webpush: {
-          fcm_options: { link: link || undefined }
+          fcm_options: { ...(link ? { link } : {}) }
         }
       }
     };
@@ -137,8 +135,8 @@ app.post('/send-multiple-messages', async (req, res) => {
         token,
         httpCode: response.status,
         response: response.data,
-        title: personalizedTitle,
-        message: personalizedBody
+        title,
+        message: body
       });
     } catch (err) {
       results.push({
@@ -163,7 +161,6 @@ app.post('/send-multiple-messages-val', async (req, res) => {
   const accessToken = await getAccessToken();
   if (!accessToken) return res.status(500).json({ error: 'Failed to get access token' });
 
-  // Replace placeholders #var, #var1, #var2
   const replaceVars = (template, vars = []) => {
     if (!Array.isArray(vars)) vars = [];
     return template
@@ -225,8 +222,7 @@ app.post('/send-multiple-messages-val', async (req, res) => {
   res.json({ results });
 });
 
-
-// Start the server
+// ✅ Start the server
 app.listen(port, () => {
   console.log(`✅ Server is running at http://localhost:${port}`);
 });
